@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
-export default function App() {
-  const { register, handleSubmit, watch, errors } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
-  };
-
-  const makeId = (length) => {
+const index = () => {
+  const makeId = (length, symbol) => {
     var result = "";
-    var characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let characters;
+    if (symbol) {
+      characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    } else {
+      characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    }
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -18,24 +20,38 @@ export default function App() {
     return result;
   };
 
-  console.log(watch("example")); // watch input value by passing the name of it
-
+  const [symbol, setSymbol] = useState(false);
   const [randomPassword, setRandomPassword] = useState("");
   const [length, setLength] = useState(10);
 
   const onGenerate = () => {
-    console.log("click generate");
-    setRandomPassword(makeId(length));
+    setIsCopy(false)
+    setRandomPassword(makeId(length, symbol));
   };
 
   const onChangePasswordLength = (e) => {
-    console.log(e.target.value);
-    setLength(e.target.value);
+    if (e.target.value > 20) {
+      setLength(20);
+    } else {
+      setLength(e.target.value);
+    }
+  };
+
+  const onIsSymbol = (checked) => {
+    console.log("checked: ", checked);
+    checked ? setSymbol(true) : setSymbol(false);
+  };
+
+  const [isCopy, setIsCopy] = useState(false);
+
+  const onCopy = () => {
+    setIsCopy(true);
   };
 
   return (
     <div>
       <div style={{ textAlign: "center", marginTop: "20%" }}>
+        <h1>Password Generator App</h1>
         <label>Password: </label>
         <input
           disabled
@@ -43,12 +59,38 @@ export default function App() {
           value={randomPassword}
           placeholder="password"
         />{" "}
+        <CopyToClipboard text={randomPassword}>
+          <button
+            disabled={randomPassword.length < 1 ? true : false}
+            onClick={onCopy}
+          >
+            Copy
+          </button>
+        </CopyToClipboard>
+        {isCopy ? (
+          <label style={{ color: "red" }}> Copied</label>
+        ) : (
+          ""
+        )}
         <br />
         <label>Password Length: </label>
         <input
-          maxLength="4"
+          style={{ marginBottom: "0.5rem" }}
+          min="1"
+          max="100"
           type="number"
+          placeholder="1-20"
+          value={length}
           onChange={(e) => onChangePasswordLength(e)}
+        />
+        <br />
+        <label>Include Symbol: </label>
+        <input
+          style={{ marginBottom: "0.5rem" }}
+          onChange={(e) => onIsSymbol(e.target.checked)}
+          type="checkbox"
+          name="isIncludeSymbol"
+          // value='isIncludeSymbol'
         />
         <br />
         <br />
@@ -56,4 +98,6 @@ export default function App() {
       </div>
     </div>
   );
-}
+};
+
+export default React.memo(index);
