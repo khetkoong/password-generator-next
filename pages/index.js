@@ -1,65 +1,59 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 
-export default function Home() {
+export default function App() {
+  const { register, handleSubmit, watch, errors } = useForm();
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
+  const makeId = (length) => {
+    var result = "";
+    var characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
+  console.log(watch("example")); // watch input value by passing the name of it
+
+  const [randomPassword, setRandomPassword] = useState("");
+  const [length, setLength] = useState(10);
+
+  const onGenerate = () => {
+    console.log("click generate");
+    setRandomPassword(makeId(length));
+  };
+
+  const onChangePasswordLength = (e) => {
+    console.log(e.target.value);
+    setLength(e.target.value);
+  };
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+    <div>
+      <div style={{ textAlign: "center", marginTop: "20%" }}>
+        <label>Password: </label>
+        <input
+          disabled
+          style={{ marginBottom: "0.5rem" }}
+          value={randomPassword}
+          placeholder="password"
+        />{" "}
+        <br />
+        <label>Password Length: </label>
+        <input
+          maxLength="4"
+          type="number"
+          onChange={(e) => onChangePasswordLength(e)}
+        />
+        <br />
+        <br />
+        <button onClick={onGenerate}>Generate</button>
+      </div>
     </div>
-  )
+  );
 }
